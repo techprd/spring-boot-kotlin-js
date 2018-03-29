@@ -1,0 +1,83 @@
+buildscript {
+    ext.kotlinVersion = "1.2.31"
+    ext.kotlinx_html_version = "0.6.9"
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url 'https://dl.bintray.com/kotlin/kotlinx.html' }
+    }
+
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+    }
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+apply plugin: 'kotlin2js'
+apply plugin: 'java'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile("org.jetbrains.kotlin:kotlin-stdlib-js:${kotlinVersion}")
+    compile("org.jetbrains.kotlin:kotlin-test-js:${kotlinVersion}")
+    compile "org.jetbrains.kotlinx:kotlinx-html-js:${kotlinx_html_version}"
+}
+compileKotlin2Js {
+    kotlinOptions.metaInfo = true
+    kotlinOptions.outputFile = "${projectDir}/js/main.js"
+    kotlinOptions.sourceMap = true
+    kotlinOptions.main = "call"
+}
+
+sourceSets {
+    main.kotlin.srcDirs += "src"
+    main.output.resourcesDir = "build/js/resources"
+}
+
+task copyResources(type: Copy) {
+    from sourceSets.main.resources.srcDirs
+    into sourceSets.main.output.resourcesDir
+    //into file(buildDir.path + "/js")
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+
+task copyKotlinFiles() {
+    configurations.compile.each { File file ->
+        copy {
+            includeEmptyDirs = false
+
+            from zipTree(file.absolutePath)
+            into "${projectDir}/js/lib/kotlin"
+            include { fileTreeElement ->
+                def path = fileTreeElement.path
+                path.endsWith(".js") && (path.startsWith("META-INF/resources/") || !path.startsWith("META-INF/"))
+            }
+        }
+    }
+}
+
+build.doLast {
+    projectDir.listFiles().collect()
+            .each { File file ->
+        copy {
+            from file.path
+            into "../spring-boot/src/main/resources/static/js/"
+
+            include { fileTreeElement ->
+                def path = fileTreeElement.path
+                path.contains(".js") || path.contains("main") || path.contains("lib") && !path.contains('libs')
+            }
+        }
+    }
+}
