@@ -3,6 +3,7 @@ package com.techprd.views
 import com.techprd.events.TodoEventEmitter
 import com.techprd.model.Task
 import com.techprd.services.StorageService
+import com.techprd.utils.Utils.randomId
 import kotlinx.html.*
 import kotlinx.html.dom.create
 import kotlinx.html.js.div
@@ -12,7 +13,7 @@ import kotlinx.html.js.onSubmitFunction
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
-import kotlin.browser.document
+import kotlinx.browser.document
 
 class Todo(var formContainer: HTMLDivElement) {
 
@@ -36,19 +37,19 @@ class Todo(var formContainer: HTMLDivElement) {
             it.preventDefault()
             val id = randomId()
             val task = Task(id, inputVal)
-            storage.put(id, task)
+            storage[id] = task
             document.getElementById("task-collection")?.append(
-                    document.create.li("collection-item avatar dismissable") {
-                        todoItem(storage, task) {
+                document.create.li("collection-item avatar dismissable") {
+                    todoItem(storage, task) {
 
-                        }
                     }
+                }
             )
         }
     }
 
     fun render() {
-        storage.getAll() {
+        storage.getAll {
             formContainer.appendChild(getForm())
         }
     }
@@ -60,7 +61,7 @@ class Todo(var formContainer: HTMLDivElement) {
                 div("card collection") {
                     div("card-content") {
                         span("card-title") {
-                            +"ToDo Sample app"
+                            +"To-Do Sample app"
                         }
                         form("/", null) {
                             div("row") {
@@ -72,7 +73,7 @@ class Todo(var formContainer: HTMLDivElement) {
                                         onInputFunction = onInput()
                                     }
                                     label("active") {
-                                        for_ = "icon_prefix"
+                                        htmlFor = "icon_prefix"
                                         +"add a new task"
                                     }
                                 }

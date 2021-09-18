@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     id("org.springframework.boot") version "2.5.4"
@@ -32,6 +33,10 @@ kotlin {
         browser {
             commonWebpackConfig {
                 cssSupport.enabled = true
+                devServer = KotlinWebpackConfig.DevServer(
+                    static = mutableListOf("$buildDir/distributions"),
+                    proxy = hashMapOf("/api" to "http://localhost:3000")
+                )
             }
         }
     }
@@ -72,7 +77,7 @@ application {
 tasks.named<Copy>("jvmProcessResources") {
     val jsBrowserDistribution = tasks.named("jsBrowserDistribution")
     from(jsBrowserDistribution) {
-        into("static/js")
+        into("static")
     }
 }
 

@@ -2,6 +2,7 @@ package com.techprd.views
 
 import com.techprd.model.Task
 import com.techprd.services.StorageService
+import com.techprd.utils.Utils.randomId
 import kotlinx.html.*
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.js.onKeyPressFunction
@@ -11,8 +12,7 @@ import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.get
-import kotlin.browser.document
-import kotlin.js.Math
+import kotlinx.browser.document
 
 /**
  * generates a list of todo items
@@ -56,19 +56,12 @@ fun LI.todoItem(storage: StorageService, task: Task, block: DIV.() -> Unit) {
                 checked = task.isDone
             }
             label {
-                for_ = inputId
+                htmlFor = inputId
                 +"Done"
                 onClickFunction = markAsDone(storage, task)
             }
         }
         block()
-    }
-}
-
-fun checkTaskIsDone(task: Task): (Event) -> Unit {
-    return {
-        console.log("rendered")
-        console.log(task)
     }
 }
 
@@ -87,15 +80,6 @@ fun markAsDone(storage: StorageService, task: Task): (Event) -> Unit {
             storage.eventEmitter.trigger(storage.undoneEvent, task)
         }
     }
-}
-
-fun randomId(): String {
-    var text = ""
-    val possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    for (i in 0..4)
-        text += possible[Math.floor(Math.random() * possible.length)]
-
-    return text
 }
 
 /**

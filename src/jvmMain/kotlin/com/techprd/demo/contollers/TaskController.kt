@@ -1,10 +1,11 @@
 package com.techprd.demo.contollers
 
-import com.techprd.demo.model.Task
+import com.techprd.model.Task
+import com.techprd.utils.Utils.randomId
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api")
 class TaskController {
 
     var db: HashMap<String, Task> = HashMap()
@@ -39,13 +40,4 @@ class TaskController {
         return task
     }
 
-}
-
-fun randomId(): String {
-    var text = ""
-    val possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    for (i in 0..4)
-        text += possible[Math.floor(Math.random() * possible.length).toInt()]
-
-    return text
 }
