@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.techprd"
-version = "1.0-SNAPSHOT"
+version = "2.5.4"
 
 repositories {
     jcenter()
@@ -35,8 +35,15 @@ kotlin {
                 cssSupport.enabled = true
                 devServer = KotlinWebpackConfig.DevServer(
                     static = mutableListOf("$buildDir/distributions"),
+                    // proxy api calls to springboot running on 3000 configured in application.yml
                     proxy = hashMapOf("/api" to "http://localhost:3000")
                 )
+            }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                    webpackConfig.cssSupport.enabled = true
+                }
             }
         }
     }
@@ -71,7 +78,7 @@ kotlin {
 }
 
 application {
-    mainClass.set("DemoApplication")
+    mainClass.set("com.techprd.demo.DemoApplicationKt")
 }
 
 tasks.named<Copy>("jvmProcessResources") {
